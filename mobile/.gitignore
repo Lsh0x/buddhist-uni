@@ -1,0 +1,25 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+*.iml
+
+# ObjectBox generated
+lib/objectbox.g.dart
+lib/objectbox-model.json
+
+# Generated assets (too large for git — regenerate with scripts/)
+assets/data/suttas_seed.json
+assets/data/embeddings.bin
+assets/data/study_plans.json
+assets/model/all-MiniLM-L6-v2.tflite
+assets/model/vocab.txt
+assets/model/onnx_tmp/
+assets/fonts/
+
+# IDE
+.idea/
+.vscode/
+*.iml
