@@ -67,3 +67,65 @@ class ReadingPathItem(BaseModel):
     url: str
     minutes: int | None = None
     pages: str | None = None
+
+
+# ---------------------------------------------------------------------------
+# Suttas & Study Plans
+# ---------------------------------------------------------------------------
+
+class SuttaInPlan(BaseModel):
+    order: int
+    sutta_id: str
+    nikaya: str
+    nikaya_name: str = ""
+    title: str
+    blurb: str = ""
+    word_count: int | None = None
+    difficulty: int | None = None
+    url: str
+
+
+class StudyPlanSummary(BaseModel):
+    cluster_id: int
+    name: str
+    description: str = ""
+    keywords: list[str] = []
+    theme_category: str = "mixed"
+    nikaya_breakdown: dict[str, int] = {}
+    size: int
+    reading_minutes: int
+    relevance_score: float | None = None
+
+
+class StudyPlanDetail(StudyPlanSummary):
+    total_words: int
+    suttas: list[SuttaInPlan]
+
+
+class SuttaSearchResult(BaseModel):
+    score: float | None = None
+    sutta_id: str
+    nikaya: str
+    nikaya_name: str = ""
+    title: str
+    blurb: str = ""
+    word_count: int | None = None
+    difficulty: int | None = None
+    cluster_id: int | None = None
+    cluster_name: str | None = None
+    url: str
+
+
+class SuttaDetail(BaseModel):
+    sutta_id: str
+    nikaya: str
+    nikaya_name: str = ""
+    title: str
+    blurb: str = ""
+    word_count: int | None = None
+    segment_count: int | None = None
+    difficulty: int | None = None
+    translator: str | None = None
+    cluster_id: int | None = None
+    cluster_name: str | None = None
+    url: str
