@@ -3,7 +3,7 @@
 import { use, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, BookOpen, Clock, ChevronRight, ExternalLink, Layers } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, ChevronRight, ExternalLink, Layers, Wifi } from "lucide-react";
 import { getStudyPlanById } from "@/lib/api";
 import { getStudyPlan } from "@/lib/study-plans";
 import { search } from "@/lib/api";
@@ -61,18 +61,34 @@ function SuttaRow({
           <span className="text-xs font-mono text-fg-subtle">{sutta.sutta_id}</span>
           <span className="text-xs text-fg-subtle opacity-50">·</span>
           <span className="text-xs text-fg-subtle">{sutta.nikaya_name || NIKAYA_NAMES[sutta.nikaya] || sutta.nikaya.toUpperCase()}</span>
+          {sutta.local && (
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-sage/10 px-1.5 py-0.5 text-[10px] font-medium text-sage">
+              <Wifi size={9} /> offline
+            </span>
+          )}
         </div>
-        <a
-          href={sutta.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group/link mt-1 flex items-center gap-1"
-        >
-          <span className="font-serif font-medium text-fg group-hover/link:text-saffron-dark">
-            {sutta.title}
-          </span>
-          <ExternalLink size={12} className="shrink-0 text-fg-subtle opacity-0 group-hover/link:opacity-100 transition-opacity" />
-        </a>
+        {sutta.local ? (
+          <Link
+            href={`/suttas/${sutta.sutta_id}`}
+            className="group/link mt-1 flex items-center gap-1"
+          >
+            <span className="font-serif font-medium text-fg group-hover/link:text-saffron-dark">
+              {sutta.title}
+            </span>
+          </Link>
+        ) : (
+          <a
+            href={sutta.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group/link mt-1 flex items-center gap-1"
+          >
+            <span className="font-serif font-medium text-fg group-hover/link:text-saffron-dark">
+              {sutta.title}
+            </span>
+            <ExternalLink size={12} className="shrink-0 text-fg-subtle opacity-0 group-hover/link:opacity-100 transition-opacity" />
+          </a>
+        )}
         {sutta.blurb && (
           <p className="mt-1 text-sm text-fg-muted line-clamp-2">{sutta.blurb}</p>
         )}

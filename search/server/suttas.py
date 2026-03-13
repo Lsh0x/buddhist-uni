@@ -19,6 +19,12 @@ from search.ingestion.embedder import get_embedder
 SUTTA_COLLECTION = "buddhist_suttas"
 REPO_ROOT = Path(__file__).parent.parent.parent
 STUDY_PLANS_FILE = REPO_ROOT / "search" / "data" / "study_plans.json"
+TEXTS_DIR = REPO_ROOT / "frontend" / "public" / "content" / "texts"
+
+
+def is_local(sutta_id: str) -> bool:
+    """Return True if a local text file exists for this sutta."""
+    return (TEXTS_DIR / f"{sutta_id}.json").exists()
 
 _sutta_client: QdrantClient | None = None
 
@@ -103,12 +109,18 @@ def get_study_plan(cluster_id: int) -> dict | None:
         cluster_id: Integer cluster ID (from /study-plans list)
 
     Returns:
-        Full plan with ordered suttas list, or None if not found
+        Full plan with ordered suttas list (each sutta includes local:bool), or None if not found
     """
     plans = _load_study_plans()
     for plan in plans:
         if plan["cluster_id"] == cluster_id:
-            return plan
+            # Enrich each sutta with local availability
+            enriched = dict(plan)
+            enriched["suttas"] = [
+                {**s, "local": is_local(s.get("sutta_id", ""))}
+                for s in plan.get("suttas", [])
+            ]
+            return enriched
     return None
 
 
@@ -237,6 +249,7 @@ def search_suttas(
             "cluster_id": hit.payload.get("cluster_id"),
             "cluster_name": hit.payload.get("cluster_name"),
             "url": hit.payload.get("url"),
+            "local": is_local(hit.payload.get("sutta_id", "")),
         }
         for hit in results
     ]
@@ -261,8 +274,9 @@ def get_sutta(sutta_id: str) -> dict | None:
         return None
 
     p = results[0].payload
+    sid = p.get("sutta_id", "")
     return {
-        "sutta_id": p.get("sutta_id"),
+        "sutta_id": sid,
         "nikaya": p.get("nikaya"),
         "nikaya_name": p.get("nikaya_name"),
         "title": p.get("title"),
@@ -274,6 +288,7 @@ def get_sutta(sutta_id: str) -> dict | None:
         "cluster_id": p.get("cluster_id"),
         "cluster_name": p.get("cluster_name"),
         "url": p.get("url"),
+        "local": is_local(sid),
     }
 
 
@@ -305,10 +320,15 @@ def get_similar_suttas(sutta_id: str, limit: int = 8) -> list[dict]:
             "score": round(hit.score, 4),
             "sutta_id": hit.payload.get("sutta_id"),
             "nikaya": hit.payload.get("nikaya"),
+            "nikaya_name": hit.payload.get("nikaya_name", ""),
             "title": hit.payload.get("title"),
             "blurb": (hit.payload.get("blurb") or "")[:120],
+            "word_count": hit.payload.get("word_count"),
+            "difficulty": hit.payload.get("difficulty"),
             "cluster_id": hit.payload.get("cluster_id"),
+            "cluster_name": hit.payload.get("cluster_name"),
             "url": hit.payload.get("url"),
+            "local": is_local(hit.payload.get("sutta_id", "")),
         }
         for hit in results
         if hit.payload.get("sutta_id") != sutta_id  # exclude self

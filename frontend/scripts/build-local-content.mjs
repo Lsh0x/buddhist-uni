@@ -16,6 +16,7 @@ import http from "http";
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const CANON_DIR = path.join(ROOT, "_content/canon");
 const SC_DATA = path.join(ROOT, "sc-data/html_text/en/pli/sutta");
+const BILARA_EN = path.join(ROOT, "sc-data/sc_bilara_data/translation/en/sujato/sutta");
 const OUT_DIR = path.join(ROOT, "frontend/public/content");
 const TEXTS_DIR = path.join(OUT_DIR, "texts");
 const ATI_CACHE = path.join(OUT_DIR, ".ati-cache");
@@ -182,7 +183,89 @@ async function downloadATI(url, cacheKey) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Bilara JSON → readable text
+// ---------------------------------------------------------------------------
+
+/**
+ * Assemble a bilara segment JSON into readable plain text.
+ * Segments are keyed like "sn56.61:1.1", "sn56.61:2.3", etc.
+ * - :0.x → title/header segments (skip :0.1 book title, use :0.3 as sutta title)
+ * - :x.y (x>=1) → text, group by paragraph number x
+ */
+function bilaraToText(segments) {
+  // Sort keys to preserve order
+  const keys = Object.keys(segments).sort((a, b) => {
+    const parse = k => {
+      const m = k.match(/:(\d+)\.(\d+)$/);
+      return m ? [parseInt(m[1]), parseInt(m[2])] : [0, 0];
+    };
+    const [pA, sA] = parse(a);
+    const [pB, sB] = parse(b);
+    return pA !== pB ? pA - pB : sA - sB;
+  });
+
+  // Group segments by paragraph index (the number before the dot in ":x.y")
+  const paragraphs = new Map();
+  let chapterTitle = "";
+
+  for (const key of keys) {
+    const m = key.match(/:(\d+)\.(\d+)$/);
+    if (!m) continue;
+    const [, pStr] = m;
+    const p = parseInt(pStr);
+    const text = (segments[key] || "").trim();
+    if (!text) continue;
+
+    if (p === 0) {
+      // :0.2 = chapter/vagga, :0.3 = sutta subtitle — use as section header
+      const sub = parseInt(m[2]);
+      if (sub === 2) chapterTitle = text;
+      // skip :0.1 (book name) and :0.3 (often same as title)
+      continue;
+    }
+
+    if (!paragraphs.has(p)) paragraphs.set(p, []);
+    paragraphs.get(p).push(text);
+  }
+
+  let result = "";
+  if (chapterTitle) result += `## ${chapterTitle}\n\n`;
+
+  for (const [, sentences] of [...paragraphs.entries()].sort((a, b) => a[0] - b[0])) {
+    result += sentences.join(" ").trim() + "\n\n";
+  }
+
+  return result.trim();
+}
+
+/**
+ * Build an index of all bilara Sujato EN translation files.
+ * Returns Map<sutta_id, filepath>
+ */
+function buildBilaraIndex() {
+  const index = new Map();
+  if (!fs.existsSync(BILARA_EN)) return index;
+
+  function walk(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        walk(path.join(dir, entry.name));
+      } else if (entry.name.endsWith("_translation-en-sujato.json")) {
+        // e.g. sn56.61_translation-en-sujato.json → sn56.61
+        const id = entry.name.replace("_translation-en-sujato.json", "");
+        index.set(id, path.join(dir, entry.name));
+      }
+    }
+  }
+  walk(BILARA_EN);
+  return index;
+}
+
+// ---------------------------------------------------------------------------
 // Main
+// ---------------------------------------------------------------------------
+
 async function main() {
   console.log("Building local content index...\n");
   fs.mkdirSync(TEXTS_DIR, { recursive: true });
@@ -298,6 +381,48 @@ async function main() {
   // Clean up temp field
   suttas.forEach(s => delete s._downloadPending);
 
+  // Pass 3: Bilara — index ALL Sujato translations not yet covered
+  console.log("Pass 3: Indexing remaining suttas from sc_bilara_data (Sujato EN)...");
+  const bilaraIndex = buildBilaraIndex();
+  console.log(`  Found ${bilaraIndex.size} bilara translation files`);
+  let bilaraNew = 0;
+
+  for (const [suttaId, bilaraFile] of bilaraIndex.entries()) {
+    const textOut = path.join(TEXTS_DIR, `${suttaId}.json`);
+    // Skip if already written by HTML or ATI passes
+    if (fs.existsSync(textOut)) continue;
+
+    try {
+      const raw = JSON.parse(fs.readFileSync(bilaraFile, "utf-8"));
+      const text = bilaraToText(raw);
+      if (text.length < 20) continue; // skip empty/trivial
+
+      // Derive title: first segment keyed ":0.3" (sutta name), fallback to ":0.2" or suttaId
+      let title = suttaId;
+      for (const [k, v] of Object.entries(raw)) {
+        if (k.endsWith(":0.3") && v.trim()) { title = v.trim(); break; }
+      }
+      if (title === suttaId) {
+        for (const [k, v] of Object.entries(raw)) {
+          if (k.endsWith(":0.2") && v.trim()) { title = v.trim(); break; }
+        }
+      }
+
+      fs.writeFileSync(textOut, JSON.stringify({
+        id: suttaId,
+        title,
+        translator: "Bhikkhu Sujato",
+        text,
+        description: "",
+        source: "suttacentral-bilara",
+      }));
+      bilaraNew++;
+    } catch {
+      // skip malformed files
+    }
+  }
+  console.log(`  Added: ${bilaraNew} new local texts from bilara\n`);
+
   // Build full content index (all categories)
   console.log("Building full content index...");
   const allContent = [];
@@ -335,11 +460,14 @@ async function main() {
   fs.writeFileSync(path.join(OUT_DIR, "all-content.json"), JSON.stringify(allContent));
 
   const totalLocal = suttas.filter(s => s.local).length;
+  const totalTextFiles = fs.readdirSync(TEXTS_DIR).filter(f => f.endsWith(".json")).length;
   console.log(`\n=== Summary ===`);
   console.log(`Canon files:        ${total}`);
   console.log(`SC matched:         ${matchedSC}`);
   console.log(`ATI downloaded:     ${matchedATI}`);
-  console.log(`Total local texts:  ${totalLocal}`);
+  console.log(`Bilara added:       ${bilaraNew}`);
+  console.log(`Total text files:   ${totalTextFiles}`);
+  console.log(`Total local texts:  ${totalLocal} (in index)`);
   console.log(`Total content:      ${allContent.length}`);
   console.log(`Output: ${OUT_DIR}/`);
 }

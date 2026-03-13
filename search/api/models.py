@@ -83,6 +83,7 @@ class SuttaInPlan(BaseModel):
     word_count: int | None = None
     difficulty: int | None = None
     url: str
+    local: bool = False  # True if text is available locally at /suttas/{sutta_id}
 
 
 class StudyPlanSummary(BaseModel):
@@ -114,6 +115,7 @@ class SuttaSearchResult(BaseModel):
     cluster_id: int | None = None
     cluster_name: str | None = None
     url: str
+    local: bool = False  # True if text is available locally at /suttas/{sutta_id}
 
 
 class SuttaDetail(BaseModel):
@@ -129,3 +131,4 @@ class SuttaDetail(BaseModel):
     cluster_id: int | None = None
     cluster_name: str | None = None
     url: str
+    local: bool = False  # True if text is available locally at /suttas/{sutta_id}

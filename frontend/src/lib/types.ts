@@ -86,6 +86,7 @@ export interface SuttaInPlan {
   word_count: number | null;
   difficulty: number | null;
   url: string;
+  local?: boolean; // True if text is available locally at /suttas/{sutta_id}
 }
 
 export interface StudyPlanSummary {
@@ -117,6 +118,7 @@ export interface SuttaSearchResult {
   cluster_id: number | null;
   cluster_name: string | null;
   url: string;
+  local?: boolean; // True if text is available locally at /suttas/{sutta_id}
 }
 
 export interface SuttaDetail {
@@ -132,6 +134,7 @@ export interface SuttaDetail {
   cluster_id: number | null;
   cluster_name: string | null;
   url: string;
+  local?: boolean; // True if text is available locally at /suttas/{sutta_id}
 }
 
 // Legacy hardcoded study plans (kept for backward compat)

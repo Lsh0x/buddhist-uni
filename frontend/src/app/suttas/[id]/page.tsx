@@ -18,16 +18,14 @@ const NIKAYA_NAMES: Record<string, string> = {
 };
 
 function SimilarSuttaCard({ sutta }: { sutta: SuttaSearchResult }) {
-  return (
-    <a
-      href={sutta.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex flex-col rounded-lg border border-bg-border bg-bg-card p-4 transition-all hover:border-saffron/40"
-    >
+  const inner = (
+    <>
       <div className="mb-1 flex items-center justify-between gap-2">
         <span className="text-xs font-mono text-fg-subtle">{sutta.sutta_id}</span>
-        <ExternalLink size={11} className="shrink-0 text-fg-subtle opacity-0 group-hover:opacity-100 transition-opacity" />
+        {sutta.local
+          ? <span className="text-[10px] font-medium text-sage">offline</span>
+          : <ExternalLink size={11} className="shrink-0 text-fg-subtle opacity-0 group-hover:opacity-100 transition-opacity" />
+        }
       </div>
       <p className="font-serif text-sm font-medium text-fg group-hover:text-saffron-dark line-clamp-2">
         {sutta.title}
@@ -39,6 +37,28 @@ function SimilarSuttaCard({ sutta }: { sutta: SuttaSearchResult }) {
         <span>{sutta.nikaya_name || NIKAYA_NAMES[sutta.nikaya] || sutta.nikaya.toUpperCase()}</span>
         {sutta.word_count && <span>{sutta.word_count.toLocaleString()} words</span>}
       </div>
+    </>
+  );
+
+  if (sutta.local) {
+    return (
+      <Link
+        href={`/suttas/${sutta.sutta_id}`}
+        className="group flex flex-col rounded-lg border border-bg-border bg-bg-card p-4 transition-all hover:border-saffron/40"
+      >
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <a
+      href={sutta.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex flex-col rounded-lg border border-bg-border bg-bg-card p-4 transition-all hover:border-saffron/40"
+    >
+      {inner}
     </a>
   );
 }
