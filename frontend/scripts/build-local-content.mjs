@@ -194,46 +194,69 @@ async function downloadATI(url, cacheKey) {
  * - :x.y (x>=1) → text, group by paragraph number x
  */
 function bilaraToText(segments) {
-  // Sort keys to preserve order
-  const keys = Object.keys(segments).sort((a, b) => {
-    const parse = k => {
-      const m = k.match(/:(\d+)\.(\d+)$/);
-      return m ? [parseInt(m[1]), parseInt(m[2])] : [0, 0];
-    };
-    const [pA, sA] = parse(a);
-    const [pB, sB] = parse(b);
-    return pA !== pB ? pA - pB : sA - sB;
-  });
+  /**
+   * Bilara keys come in two formats:
+   *   2-level: "sn56.61:1.1"  → paragraph=1, sentence=1
+   *   3-level: "dn3:1.2.1"    → section=1, paragraph=2, sentence=1
+   *
+   * We normalise to a sortable tuple and group by (section, paragraph).
+   */
+  function parseKey(k) {
+    // Match everything after the colon
+    const m = k.match(/:(\d+)\.(\d+)(?:\.(\d+))?$/);
+    if (!m) return null;
+    const a = parseInt(m[1]);
+    const b = parseInt(m[2]);
+    const c = m[3] !== undefined ? parseInt(m[3]) : null;
+    return { a, b, c };
+  }
 
-  // Group segments by paragraph index (the number before the dot in ":x.y")
+  const entries = Object.entries(segments)
+    .map(([k, v]) => ({ k, v: (v || "").trim(), p: parseKey(k) }))
+    .filter(e => e.p !== null)
+    .sort((x, y) => {
+      if (x.p.a !== y.p.a) return x.p.a - y.p.a;
+      if (x.p.b !== y.p.b) return x.p.b - y.p.b;
+      return (x.p.c ?? 0) - (y.p.c ?? 0);
+    });
+
+  // Group into paragraphs by (section, paragraph) — i.e. the first two numbers
+  // For 2-level keys: group key = "a" (paragraph); for 3-level: "a.b" (section.paragraph)
   const paragraphs = new Map();
   let chapterTitle = "";
 
-  for (const key of keys) {
-    const m = key.match(/:(\d+)\.(\d+)$/);
-    if (!m) continue;
-    const [, pStr] = m;
-    const p = parseInt(pStr);
-    const text = (segments[key] || "").trim();
-    if (!text) continue;
+  for (const { p, v } of entries) {
+    if (!v) continue;
 
-    if (p === 0) {
-      // :0.2 = chapter/vagga, :0.3 = sutta subtitle — use as section header
-      const sub = parseInt(m[2]);
-      if (sub === 2) chapterTitle = text;
-      // skip :0.1 (book name) and :0.3 (often same as title)
+    // Header segments: a===0
+    if (p.a === 0) {
+      // b===2 → chapter/vagga title
+      if (p.b === 2) chapterTitle = v;
+      // skip :0.1 (book name), :0.3 (often same as sutta title)
       continue;
     }
 
-    if (!paragraphs.has(p)) paragraphs.set(p, []);
-    paragraphs.get(p).push(text);
+    // Build paragraph group key
+    const groupKey = p.c !== null ? `${p.a}.${p.b}` : `${p.a}`;
+    if (!paragraphs.has(groupKey)) paragraphs.set(groupKey, []);
+    paragraphs.get(groupKey).push(v);
   }
+
+  // Sort group keys numerically (handle "1.2" < "1.10" < "2.1")
+  const sortedKeys = [...paragraphs.keys()].sort((a, b) => {
+    const pa = a.split(".").map(Number);
+    const pb = b.split(".").map(Number);
+    for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+      const diff = (pa[i] ?? 0) - (pb[i] ?? 0);
+      if (diff !== 0) return diff;
+    }
+    return 0;
+  });
 
   let result = "";
   if (chapterTitle) result += `## ${chapterTitle}\n\n`;
-
-  for (const [, sentences] of [...paragraphs.entries()].sort((a, b) => a[0] - b[0])) {
-    result += sentences.join(" ").trim() + "\n\n";
+  for (const key of sortedKeys) {
+    result += paragraphs.get(key).join(" ").trim() + "\n\n";
   }
 
   return result.trim();

@@ -10348,9 +10348,17 @@
   },
   {
     "cluster_id": 0,
-    "name": "Cluster 0",
-    "description": "36 suttas on  (SN dominant)",
-    "keywords": [],
+    "name": "Four Noble Truths: Abbreviated SN 56 Texts",
+    "description": "Abbreviated suttas from the Sacca-saṁyutta (SN 56) teaching the Four Noble Truths in condensed form, directed at those with little dust in their eyes.",
+    "keywords": [
+      "four noble truths",
+      "sacca",
+      "dukkha",
+      "nirodha",
+      "magga",
+      "abbreviated",
+      "sacca-saṁyutta"
+    ],
     "theme_category": "doctrine",
     "nikaya_breakdown": {
       "sn": 36
@@ -25782,10 +25790,18 @@
   },
   {
     "cluster_id": 70,
-    "name": "Cluster 70",
-    "description": "19 suttas on  (AN dominant)",
-    "keywords": [],
-    "theme_category": "doctrine",
+    "name": "Good Qualities (Kusala Dhammas) — AN 10 Abbreviated",
+    "description": "Abbreviated suttas from AN 10 chapters 14 and 18 ('Good'), enumerating sets of ten wholesome qualities and their fruits for practitioners.",
+    "keywords": [
+      "kusala",
+      "good qualities",
+      "ten factors",
+      "aṅguttara",
+      "abbreviated",
+      "wholesome",
+      "dhamma"
+    ],
+    "theme_category": "ethics",
     "nikaya_breakdown": {
       "an": 19
     },
@@ -28280,9 +28296,18 @@
   },
   {
     "cluster_id": 54,
-    "name": "Cluster 54",
-    "description": "18 suttas on  (THAG dominant)",
-    "keywords": [],
+    "name": "Long Elder Verses: Poems of Awakening",
+    "description": "Extended verses from Theragāthā and Therīgāthā (Books of Twenties and Thirties), in which senior monks and nuns express in poetry the depth of their spiritual liberation.",
+    "keywords": [
+      "theragāthā",
+      "therīgāthā",
+      "elder verses",
+      "liberation",
+      "poetry",
+      "bhikkhu",
+      "bhikkhunī",
+      "awakening"
+    ],
     "theme_category": "poetry",
     "nikaya_breakdown": {
       "thag": 12,
@@ -30990,10 +31015,18 @@
   },
   {
     "cluster_id": 5,
-    "name": "Cluster 5",
-    "description": "15 suttas on  (CP dominant)",
-    "keywords": [],
-    "theme_category": "mixed",
+    "name": "Cariyāpiṭaka: Yudhañjaya Chapter Perfections",
+    "description": "Verses from the Cariyāpiṭaka's Yudhañjaya chapter (cp21–35), recounting the Bodhisatta's past lives that exemplify the ten perfections (pāramīs).",
+    "keywords": [
+      "cariyāpiṭaka",
+      "pāramī",
+      "perfections",
+      "bodhisatta",
+      "yudhañjaya",
+      "past lives",
+      "conduct"
+    ],
+    "theme_category": "narrative",
     "nikaya_breakdown": {
       "cp": 15
     },
@@ -38170,9 +38203,16 @@
   },
   {
     "cluster_id": 1,
-    "name": "Cluster 1",
-    "description": "11 suttas on  (AN dominant)",
-    "keywords": [],
+    "name": "Eleven-Factored Teachings (Ekadasaka Nipāta)",
+    "description": "Abbreviated Aṅguttara Nikāya texts from the Book of Elevens (AN 11), presenting condensed teachings enumerated in groups of eleven factors.",
+    "keywords": [
+      "ekādasaka",
+      "eleven factors",
+      "aṅguttara",
+      "abbreviated",
+      "enumeration",
+      "dhamma factors"
+    ],
     "theme_category": "doctrine",
     "nikaya_breakdown": {
       "an": 11
@@ -41069,10 +41109,18 @@
   },
   {
     "cluster_id": 45,
-    "name": "Cluster 45",
-    "description": "10 suttas on  (CP dominant)",
-    "keywords": [],
-    "theme_category": "mixed",
+    "name": "Cariyāpiṭaka: Akitti Chapter & Renunciation",
+    "description": "Opening chapter of the Cariyāpiṭaka (cp1–10, Akitti chapter), narrating the Bodhisatta's exemplary acts of renunciation and virtue in former lives.",
+    "keywords": [
+      "cariyāpiṭaka",
+      "akitti",
+      "renunciation",
+      "nekkhamma",
+      "bodhisatta",
+      "perfections",
+      "pāramī"
+    ],
+    "theme_category": "narrative",
     "nikaya_breakdown": {
       "cp": 10
     },

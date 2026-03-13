@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 
 export function Footer() {
   return (
@@ -6,10 +7,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-12">
         <div className="grid gap-8 sm:grid-cols-3">
           <div>
-            <h3 className="mb-3 font-serif text-lg font-bold text-burgundy">
-              <span className="mr-1">&#9784;</span> Buddhist University
-            </h3>
-            <p className="text-sm text-fg-muted">
+            <p className="text-sm text-fg-muted leading-relaxed">
               A free Buddhist education for the digital generation. 4,494+ texts covering
               Theravada, Mahayana, and Vajrayana traditions.
             </p>
@@ -28,14 +26,31 @@ export function Footer() {
             <h4 className="mb-3 text-sm font-semibold text-fg">About</h4>
             <div className="flex flex-col gap-2">
               <Link href="/about" className="text-sm text-fg-muted hover:text-saffron-dark">About</Link>
-              <a href="https://github.com/buddhist-uni/buddhist-uni.github.io" target="_blank" rel="noopener noreferrer" className="text-sm text-fg-muted hover:text-saffron-dark">
+              <a
+                href="https://github.com/buddhist-uni/buddhist-uni.github.io"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-fg-muted hover:text-saffron-dark"
+              >
                 GitHub
               </a>
             </div>
           </div>
         </div>
-        <div className="mt-8 border-t border-bg-border pt-6 text-center text-xs text-fg-subtle">
-          Open source. Open access. Open hearts.
+        <div className="mt-8 border-t border-bg-border pt-6 flex flex-col items-center gap-2 text-center text-xs text-fg-subtle">
+          <p>Open source. Open access. Open hearts.</p>
+          <p>
+            Built on{" "}
+            <a
+              href="https://www.buddhistuniversity.net"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-0.5 text-saffron-dark hover:underline"
+            >
+              The Open Buddhist University
+              <ExternalLink size={11} className="ml-0.5" />
+            </a>
+          </p>
         </div>
       </div>
     </footer>

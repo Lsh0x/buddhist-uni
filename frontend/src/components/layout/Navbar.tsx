@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: "/courses", label: "Courses" },
   { href: "/study-plans", label: "Study Plans" },
   { href: "/reading-path", label: "Reading Path" },
+  { href: "/notes", label: "Notes" },
   { href: "/about", label: "About" },
 ];
 
@@ -31,9 +32,8 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 border-b border-bg-border bg-bg/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 font-serif text-xl font-bold text-burgundy">
+        <Link href="/" className="flex items-center gap-1 text-burgundy" aria-label="Home">
           <span className="text-2xl">&#9784;</span>
-          Buddhist University
         </Link>
 
         <div className="hidden items-center gap-6 md:flex">
