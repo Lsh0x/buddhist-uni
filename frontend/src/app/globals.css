@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+:root {
+  --saffron: #E8A317;
+  --saffron-light: #F5C94C;
+  --saffron-dark: #B87D0F;
+  --burgundy: #6B1D2A;
+  --burgundy-light: #8B2E3D;
+  --burgundy-dark: #4A1019;
+  --cream: #FDF6E3;
+  --cream-dark: #F5ECD7;
+  --cream-darker: #EDE0C8;
+  --lotus-pink: #D4829C;
+  --lotus-light: #E8A8BE;
+  --sage: #5B7F5E;
+  --sage-light: #7AA37D;
+  --dharma-gold: #C9A84C;
+  --text-primary: #2C1810;
+  --text-secondary: #5C4A3D;
+  --text-tertiary: #8A7B6E;
+
+  --bg: var(--cream);
+  --bg-card: var(--cream-dark);
+  --bg-border: var(--cream-darker);
+  --fg: var(--text-primary);
+  --fg-muted: var(--text-secondary);
+  --fg-subtle: var(--text-tertiary);
+}
+
+.dark {
+  --bg: #1A1412;
+  --bg-card: #2A2220;
+  --bg-border: #3A3230;
+  --fg: #F0E8DF;
+  --fg-muted: #B0A89F;
+  --fg-subtle: #7A726A;
+}
+
+@theme inline {
+  --color-saffron: var(--saffron);
+  --color-saffron-light: var(--saffron-light);
+  --color-saffron-dark: var(--saffron-dark);
+  --color-burgundy: var(--burgundy);
+  --color-burgundy-light: var(--burgundy-light);
+  --color-burgundy-dark: var(--burgundy-dark);
+  --color-cream: var(--cream);
+  --color-cream-dark: var(--cream-dark);
+  --color-cream-darker: var(--cream-darker);
+  --color-lotus: var(--lotus-pink);
+  --color-lotus-light: var(--lotus-light);
+  --color-sage: var(--sage);
+  --color-sage-light: var(--sage-light);
+  --color-dharma-gold: var(--dharma-gold);
+
+  --color-bg: var(--bg);
+  --color-bg-card: var(--bg-card);
+  --color-bg-border: var(--bg-border);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+
+  --font-serif: var(--font-crimson-pro);
+  --font-sans: var(--font-inter);
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+::selection {
+  background: var(--saffron);
+  color: var(--cream);
+}
