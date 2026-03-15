@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from search.api.search import router as search_router
 from search.api.courses import router as courses_router
+from search.api.study_plans import router as study_plans_router
 
 app = FastAPI(
     title="Buddhist University Search API",
@@ -35,6 +36,7 @@ app.add_middleware(
 
 app.include_router(search_router, tags=["Search"])
 app.include_router(courses_router, tags=["Courses"])
+app.include_router(study_plans_router, tags=["Study Plans & Suttas"])
 
 
 @app.get("/", tags=["Health"])
@@ -49,6 +51,12 @@ def root():
             "courses": "GET /courses",
             "course_detail": "GET /courses/{id}",
             "teacher": "GET /teachers/{slug}",
+            "study_plans": "GET /study-plans?theme=...&nikaya=...",
+            "study_plan_search": "GET /study-plans/search?topic=...",
+            "study_plan_detail": "GET /study-plans/{cluster_id}",
+            "sutta_search": "GET /suttas/search?q=...&nikaya=...",
+            "sutta_detail": "GET /suttas/{sutta_id}",
+            "sutta_similar": "GET /suttas/{sutta_id}/similar",
         },
     }
 
